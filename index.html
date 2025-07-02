@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>📱 브루마블 특허 전략 학습</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        .mobile-app {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* 상단 헤더 */
+        .app-header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .app-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 60px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 11.11%;
+        }
+
+        /* 슬라이드 컨테이너 */
+        .slides-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .slide.prev {
+            transform: translateX(-100%);
+        }
+
+        /* 슬라이드 제목 */
+        .slide-title {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            margin-bottom: 16px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .slide-subtitle {
+            font-size: 1em;
+            color: rgba(255,255,255,0.9);
+            text-align: center;
+            margin-bottom: 20px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        /* 카드 스타일 */
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2em;
+            color: white;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .card-content {
+            font-size: 0.95em;
+            line-height: 1.5;
+            color: #555;
+        }
+
+        /* 게임판 모바일 버전 */
+        .mobile-game-board {
+            width: 280px;
+            height: 280px;
+            margin: 16px auto;
+            position: relative;
+            background: #2c5f2d;
+            border-radius: 12px;
+            border: 4px solid #8B4513;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .mobile-board-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.8em;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        /* 특허 게임판 모바일 버전 */
+        .mobile-patent-board {
+            width: 280px;
+            height: 280px;
+            margin: 16px auto;
+            position: relative;
+            background: #f0f0f0;
+            border-radius: 12px;
+            border: 4px solid #333;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .mobile-patent-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 140px;
+            height: 140px;
+            background: linear-gradient(135deg, #8B5CF6, #6D28D9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-weight: bold;
+            text-align: center;
+            color: white;
+            font-size: 0.75em;
+            line-height: 1.2;
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.4);
+        }
+
+        /* 스텝 리스트 모바일 버전 */
+        .mobile-step-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .mobile-step-item {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 12px;
+            padding: 12px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .mobile-step-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 0.9em;
+        }
+
+        .mobile-step-content {
+            flex: 1;
+        }
+
+        .mobile-step-content strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #2c3e50;
+            font-size: 0.95em;
+        }
+
+        /* 전략 카드 그리드 */
+        .strategy-mobile-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .strategy-mobile-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+
+        .strategy-mobile-card:active {
+            transform: scale(0.98);
+            border-color: #667eea;
+        }
+
+        .strategy-mobile-icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .strategy-mobile-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .strategy-mobile-desc {
+            font-size: 0.85em;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* 하이라이트 그리드 */
+        .highlight-mobile-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+        }
+
+        .highlight-mobile-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 16px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .highlight-mobile-card h3 {
+            color: #667eea;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .highlight-mobile-card p {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        /* 타임라인 모바일 */
+        .mobile-timeline {
+            margin: 16px 0;
+        }
+
+        .timeline-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .timeline-label {
+            width: 80px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: white;
+            text-align: center;
+            padding: 6px;
+            border-radius: 8px;
+            margin-right: 12px;
+        }
+
+        .timeline-label.dev {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .timeline-label.patent {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+        }
+
+        .timeline-content {
+            flex: 1;
+            display: flex;
+            gap: 4px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+        }
+
+        .timeline-step {
+            min-width: 80px;
+            padding: 8px 6px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.7em;
+            font-weight: 600;
+            color: #333;
+            line-height: 1.2;
+        }
+
+        /* 체크리스트 모바일 */
+        .mobile-checklist {
+            margin: 16px 0;
+        }
+
+        .checklist-section {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        .checklist-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .checklist-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .checklist-title {
+            font-size: 1em;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            padding: 8px;
+            background: rgba(255,255,255,0.7);
+            border-radius: 8px;
+            border-left: 3px solid #667eea;
+        }
+
+        .checkbox {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #667eea;
+            border-radius: 4px;
+            margin-top: 1px;
+            flex-shrink: 0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox.checked {
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+        }
+
+        .checklist-text {
+            flex: 1;
+            font-size: 0.85em;
+            line-height: 1.3;
+            color: #2c3e50;
+        }
+
+        /* Q&A 모바일 */
+        .qa-mobile-container {
+            margin: 16px 0;
+        }
+
+        .qa-mobile-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #667eea;
+        }
+
+        .qa-mobile-question {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .qa-mobile-answer {
+            color: #555;
+            line-height: 1.5;
+            font-size: 0.9em;
+        }
+
+        /* 하단 네비게이션 */
+        .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(0,0,0,0.1);
+            position: sticky;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 12px;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .nav-btn:active {
+            transform: scale(0.95);
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .slide-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            transition: all 0.2s ease;
+        }
+
+        .dot.active {
+            background: #667eea;
+            transform: scale(1.2);
+        }
+
+        /* 특별한 카드들 */
+        .highlight-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin: 16px 0;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+        }
+
+        .highlight-card h3 {
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .highlight-card p {
+            line-height: 1.5;
+            opacity: 0.95;
+        }
+
+        .comparison-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin: 16px 0;
+        }
+
+        .comparison-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 16px;
+            border-left: 4px solid #667eea;
+        }
+
+        .comparison-card.game {
+            border-left-color: #ff6b6b;
+        }
+
+        .comparison-card.patent {
+            border-left-color: #4ecdc4;
+        }
+
+        /* 스와이프 인디케이터 */
+        .swipe-hint {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8em;
+            text-align: center;
+            animation: fadeInOut 2s infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        /* 반응형 조정 */
+        @media (max-width: 320px) {
+            .mobile-game-board,
+            .mobile-patent-board {
+                width: 240px;
+                height: 240px;
+            }
+
+            .mobile-board-center,
+            .mobile-patent-center {
+                width: 120px;
+                height: 120px;
+                font-size: 0.7em;
+            }
+
+            .slide-title {
+                font-size: 1.2em;
+            }
+
+            .content-card {
+                padding: 16px;
+            }
+        }
+
+        /* 다크모드 지원 */
+        @media (prefers-color-scheme: dark) {
+            .content-card {
+                background: rgba(40, 44, 52, 0.95);
+                color: #e6e6e6;
+            }
+
+            .card-title {
+                color: #f8f9fa;
+            }
+
+            .card-content {
+                color: #d1d5db;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app">
+        <!-- 상단 헤더 -->
+        <div class="app-header">
+            <div class="header-content">
+                <div class="app-title">🎲 특허 전략 학습</div>
+                <div class="slide-indicator">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <span id="slideCounter">1/9</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 슬라이드 컨테이너 -->
+        <div class="slides-container">
+            <!-- 슬라이드 1: 시작 -->
+            <div class="slide active">
+                <div class="slide-title">🎲 브루마블로 배우는 특허 전략</div>
+                <div class="slide-subtitle">제품 개발자를 위한 게임형 IP 전략 완전 가이드</div>
+                
+                <div class="highlight-mobile-grid">
+                    <div class="highlight-mobile-card">
+                        <h3>👥 대상</h3>
+                        <p>연구소 제품 개발자</p>
+                    </div>
+                    <div class="highlight-mobile-card">
+                        <h3>⏰ 시간</h3>
+                        <p>30분</p>
+                    </div>
+                    <div class="highlight-mobile-card">
+                        <h3>🎯 목표</h3>
+                        <p>직관적 특허 전략 이해</p>
+                    </div>
+                    <div class="highlight-mobile-card">
+                        <h3>🏆 결과</h3>
+                        <p>실무 즉시 적용</p>
+                    </div>
+                </div>
+
+                <div class="highlight-card">
+                    <h3>💡 핵심 아이디어</h3>
+                    <p>"브루마블에서 승리하는 전략과 특허 포트폴리오 구축 전략은 놀라울 정도로 유사합니다!"</p>
+                </div>
+            </div>
+
+            <!-- 슬라이드 2: 프레임워크 -->
+            <div class="slide">
+                <div class="slide-title">🎮 게임 전략 = 특허 전략</div>
+                <div class="slide-subtitle">4단계 프레임워크</div>
+
+                <div class="comparison-container">
+                    <div class="comparison-card game">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(135deg, #ff6b6b, #ee5a52);">🎲</div>
+                            <div class="card-title">브루마블 게임</div>
+                        </div>
+                        <div class="mobile-game-board">
+                            <div class="mobile-board-center">
+                                <div style="font-size: 1.2em;">🎲</div>
+                                <div>브루마블</div>
+                                <div style="font-size: 0.8em;">SEOUL</div>
+                            </div>
+                        </div>
+                        <ul class="mobile-step-list">
+                            <li class="mobile-step-item">
+                                <div class="mobile-step-number">1</div>
+                                <div class="mobile-step-content">
+                                    <strong>부동산 구매</strong>
+                                    명동, 강남 등 핵심 지역 선점
+                                </div>
+                            </li>
+                            <li class="mobile-step-item">
+                                <div class="mobile-step-number">2</div>
+                                <div class="mobile-step-content">
+                                    <strong>건물 건설</strong>
+                                    집→빌딩→호텔로 업그레이드
+                                </div>
+                            </li>
+                            <li class="mobile-step-item">
+                                <div class="mobile-step-number">3</div>
+                                <div class="mobile-step-content">
+                                    <strong>통행료 징수</strong>
+                                    상대방 방문 시 수익 창출
+                                </div>
+                            </li>
+                            <li class="mobile-step-item">
+                                <div class="mobile-step-number">4</div>
+                                <div class="mobile-step-content">
+                                    <strong>독점과 승리</strong>
+                                    색깔별 완전 독점으로 게임 지배
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="comparison-card patent">
+                        <div class="card-header">
+                            <div class="card-icon" style="background: linear-gradient(135deg, #4ecdc4, #44a08d);">📋</div>
+                            <div class="card-title">특허 포트폴리오</div>
+                        </div>
+                        <div class="mobile-patent-board">
+                            <div class="mobile-patent-center">
+                                <div style="margin-bottom: 4px;">특허 포트폴리오</div>
+                                <div style="font-size: 0.8em; margin-bottom: 6px;">의료용 레이저 미용기기</div>
+                                <div style="font-size: 0.7em;">
+                                    <div>🏠 = 기본특허</div>
+                                    <div>🏨 = 개량특허</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="content-card">
+                            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                                <div style="font-size: 1.2em; margin-right: 8px;">🎯</div>
+                                <div style="font-size: 0.9em;">
+                                    <strong>핵심 지역 선점</strong><br>
+                                    <span style="color: #666;">강남역(핵심기술)처럼 경쟁사가 반드시 거쳐야 하는 필수 기술을 먼저 확보</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                                <div style="font-size: 1.2em; margin-right: 8px;">🏠</div>
+                                <div style="font-size: 0.9em;">
+                                    <strong>건물 단계별 구축</strong><br>
+                                    <span style="color: #666;">기본특허(집) → 강화특허(호텔)로 포트폴리오 강화</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; margin-bottom: 12px;">
+                                <div style="font-size: 1.2em; margin-right: 8px;">🛡️</div>
+                                <div style="font-size: 0.9em;">
+                                    <strong>방어벽 형성</strong><br>
+                                    <span style="color: #666;">주변 지역까지 매입하여 경쟁사의 우회로 차단</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start;">
+                                <div style="font-size: 1.2em; margin-right: 8px;">💰</div>
+                                <div style="font-size: 0.9em;">
+                                    <strong>수익 창출</strong><br>
+                                    <span style="color: #666;">완성된 포트폴리오로 라이선싱 수익 및 협상력 확보</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 3: 출원 전략 -->
+            <div class="slide">
+                <div class="slide-title">🎯 기본 특허 출원 전략</div>
+                <div class="slide-subtitle">게임 시작 단계</div>
+
+                <div class="strategy-mobile-grid">
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">🎨</div>
+                        <div class="strategy-mobile-title">색깔별 독점 전략</div>
+                        <div class="strategy-mobile-desc">하나의 제품 기능을 위한 다각도 특허 출원</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; background: #f0f8ff; padding: 6px; border-radius: 6px;">
+                            <strong>RF 기기 온도제어:</strong><br>
+                            센서·알고리즘·냉각·UI 특허
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">🛡️</div>
+                        <div class="strategy-mobile-title">필수 경로 선점</div>
+                        <div class="strategy-mobile-desc">경쟁사 제품 개발 필수 기술 경로 차단</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; background: #f0fff0; padding: 6px; border-radius: 6px;">
+                            <strong>전략적 사고:</strong><br>
+                            A→B→C 중 B기술 선점!
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">💰</div>
+                        <div class="strategy-mobile-title">전략적 예산 배분</div>
+                        <div class="strategy-mobile-desc">핵심 기술 우선순위에 따른 선택과 집중</div>
+                        <div style="margin-top: 8px; font-size: 0.8em; background: #fff5ee; padding: 6px; border-radius: 6px;">
+                            <strong>우선순위:</strong><br>
+                            고가치+고위험=최우선
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-card">
+                    <h3>💡 개발자 핵심 질문</h3>
+                    <p>"여러분이 개발하는 레이저 치료기기, 만약 핵심 기술을 모두 특허로 보호했다면 경쟁사는 어떻게 될까요?"</p>
+                    <p style="margin-top: 8px; font-style: italic;">→ 브루마블에서 명동, 강남을 모두 소유한 상황!</p>
+                </div>
+
+                <div class="content-card">
+                    <h3 style="color: #2c3e50; margin-bottom: 12px;">🎯 실무 특허 전략</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin: 6px 0; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">📋</span> 발명 공개 전 특허 출원
+                        </li>
+                        <li style="margin: 6px 0; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">📝</span> 발명 노트 작성 관리
+                        </li>
+                        <li style="margin: 6px 0; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">📊</span> 기술적 효과 정량 입증
+                        </li>
+                        <li style="margin: 6px 0; display: flex; align-items: center;">
+                            <span style="margin-right: 8px;">🔄</span> 다양한 구현예 확보
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 슬라이드 4: 포트폴리오 강화 -->
+            <div class="slide">
+                <div class="slide-title">🏢 특허 포트폴리오 강화</div>
+                <div class="slide-subtitle">단계별 업그레이드 전략</div>
+
+                <div style="text-align: center; margin: 16px 0;">
+                    <div class="content-card">
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 16px;">
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em;">🏠</div>
+                                <div style="font-weight: bold; font-size: 0.9em;">주택</div>
+                                <div style="font-size: 0.8em; color: #666;">기본특허</div>
+                            </div>
+                            <div style="font-size: 1.2em; color: #667eea;">→</div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em;">🏢</div>
+                                <div style="font-weight: bold; font-size: 0.9em;">빌딩</div>
+                                <div style="font-size: 0.8em; color: #666;">개량특허</div>
+                            </div>
+                            <div style="font-size: 1.2em; color: #667eea;">→</div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 2em;">🏨</div>
+                                <div style="font-weight: bold; font-size: 0.9em;">호텔</div>
+                                <div style="font-size: 0.8em; color: #666;">원천특허</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy-mobile-grid">
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">⬆️</div>
+                        <div class="strategy-mobile-title">수직적 확장</div>
+                        <div class="strategy-mobile-desc">기술 심화 발전으로 성능과 품질 향상</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #f0f8ff; padding: 6px; border-radius: 6px;">
+                            1세대: 기본 제어<br>
+                            2세대: 자동 조절<br>
+                            3세대: AI 최적화
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">↔️</div>
+                        <div class="strategy-mobile-title">수평적 확장</div>
+                        <div class="strategy-mobile-desc">다양한 응용 분야로 활용 범위 확대</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #f0fff0; padding: 6px; border-radius: 6px;">
+                            의료→미용→예방<br>
+                            얼굴→전신→전문가용
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">🌐</div>
+                        <div class="strategy-mobile-title">글로벌 확장</div>
+                        <div class="strategy-mobile-desc">PCT 출원으로 주요국 시장 보호</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #fff5ee; padding: 6px; border-radius: 6px;">
+                            1순위: 미국·EU·일본<br>
+                            2순위: 중국·인도
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3 style="color: #2c3e50; margin-bottom: 12px;">🎯 개발자 핵심 팁</h3>
+                    <p style="line-height: 1.5; font-size: 0.9em;">개발 과정의 모든 진화 단계마다 특허 출원 기회를 검토하세요. 특히 경쟁사가 우회할 가능성이 있는 기술 영역에 대한 특허 장벽을 구축하는 것이 중요합니다.</p>
+                </div>
+            </div>
+
+            <!-- 슬라이드 5: 방어 전략 -->
+            <div class="slide">
+                <div class="slide-title">💵 방어적 특허 전략</div>
+                <div class="slide-subtitle">라이센싱 & 협상력</div>
+
+                <div class="strategy-mobile-grid">
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">💰</div>
+                        <div class="strategy-mobile-title">라이센싱 수익</div>
+                        <div class="strategy-mobile-desc">경쟁사 기술 사용 시 로열티 창출</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #f0f8ff; padding: 6px; border-radius: 6px;">
+                            • 정액: 일시금<br>
+                            • 로열티: 매출 3-8%<br>
+                            • 크로스: 특허 교환
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">⚖️</div>
+                        <div class="strategy-mobile-title">협상력 극대화</div>
+                        <div class="strategy-mobile-desc">강한 포트폴리오로 협상 우위 확보</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #f0fff0; padding: 6px; border-radius: 6px;">
+                            우리 3건 vs 상대 1건<br>
+                            → 유리한 조건 협상
+                        </div>
+                    </div>
+
+                    <div class="strategy-mobile-card">
+                        <div class="strategy-mobile-icon">🛡️</div>
+                        <div class="strategy-mobile-title">진입 장벽</div>
+                        <div class="strategy-mobile-desc">핵심 경로에 특허 장벽 설치</div>
+                        <div style="margin-top: 8px; font-size: 0.75em; background: #fff5ee; padding: 6px; border-radius: 6px;">
+                            • 우회 설계 차단<br>
+                            • 표준 특허 확보<br>
+                            • 침해 감시 시스템
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comparison-container">
+                    <div class="comparison-card game">
+                        <strong>브루마블:</strong> 상대방이 내 땅에 도착 → 임대료 지불
+                    </div>
+                    <div class="comparison-card patent">
+                        <strong>특허:</strong> 경쟁사가 내 기술 사용 → 로열티 지불
+                    </div>
+                </div>
+
+                <div class="highlight-card">
+                    <h3>📊 협상 시나리오</h3>
+                    <div style="margin-bottom: 12px;">
+                        <strong>시나리오 1:</strong> 우리가 압도적 우위<br>
+                        <span style="font-size: 0.9em;">→ 높은 로열티율 또는 일시금</span>
+                    </div>
+                    <div>
+                        <strong>시나리오 2:</strong> 서로 비슷한 수준<br>
+                        <span style="font-size: 0.9em;">→ 상호 라이센스로 Win-Win</span>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h4 style="color: #e74c3c; margin-bottom: 8px;">🎯 개발자 핵심 팁</h4>
+                    <p style="font-size: 0.9em; line-height: 1.5;">신제품 개발 초기부터 특허팀과 협력하여 방어 전략을 수립하세요. 경쟁사가 반드시 필요로 하는 기술 요소를 파악하고, 이를 특허로 선점하여 협상력을 높이는 것이 중요합니다.</p>
+                </div>
+            </div>
+
+            <!-- 슬라이드 6: 타임라인 -->
+            <div class="slide">
+                <div class="slide-title">⏱️ 개발 vs 특허 동기화</div>
+                <div class="slide-subtitle">타임라인 관리</div>
+
+                <div class="mobile-timeline">
+                    <div class="timeline-row">
+                        <div class="timeline-label dev">🛠️ 개발</div>
+                        <div class="timeline-content">
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">
+                                기획<br><span style="font-size: 0.6em;">요구사항</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #a8edea, #fed6e3);">
+                                설계<br><span style="font-size: 0.6em;">상세설계</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #d299c2, #fef9d7);">
+                                시제품<br><span style="font-size: 0.6em;">프로토타입</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #89f7fe, #66a6ff);">
+                                테스트<br><span style="font-size: 0.6em;">성능검증</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #fa709a, #fee140);">
+                                양산<br><span style="font-size: 0.6em;">제조공정</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #43e97b, #38f9d7);">
+                                출시<br><span style="font-size: 0.6em;">시장투입</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-row">
+                        <div class="timeline-label patent">📋 특허</div>
+                        <div class="timeline-content">
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #ff9a9e, #fecfef); border: 2px solid #e74c3c;">
+                                FTO<br><span style="font-size: 0.6em;">침해평가</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #fbc2eb, #a6c1ee);">
+                                지형분석<br><span style="font-size: 0.6em;">경쟁동향</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #fdcbf1, #e6dee9); border: 2px solid #e74c3c;">
+                                출원<br><span style="font-size: 0.6em;">명세서</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #a1c4fd, #c2e9fb);">
+                                심사<br><span style="font-size: 0.6em;">보정서</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #ffecd2, #fcb69f);">
+                                등록<br><span style="font-size: 0.6em;">권리확정</span>
+                            </div>
+                            <div class="timeline-step" style="background: linear-gradient(135deg, #d4fc79, #96e6a1);">
+                                유지<br><span style="font-size: 0.6em;">라이선싱</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="highlight-card">
+                    <h3>⚠️ 중요한 타이밍</h3>
+                    <p>FTO 분석은 개발 시작 전, 특허 출원은 시제품 완성 후 즉시!</p>
+                </div>
+                
+                <div class="content-card">
+                    <h3 style="color: #2c3e50; margin-bottom: 12px;">⏰ 단계별 타이밍 가이드</h3>
+                    
+                    <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 6px;">🔍 기획 단계 (1-2개월)</div>
+                        <div style="font-size: 0.8em; color: #7f8c8d; line-height: 1.3;">
+                            • FTO 분석 필수 완료<br>
+                            • 경쟁사 특허 지형 파악<br>
+                            • 우회 설계 전략 수립
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 6px;">🛠️ 설계 단계 (2-3개월)</div>
+                        <div style="font-size: 0.8em; color: #7f8c8d; line-height: 1.3;">
+                            • 특허 회피 설계 적용<br>
+                            • 발명 포인트 도출<br>
+                            • 차별화 기술 개발
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 12px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 6px;">🧪 시제품 단계 (3-4개월)</div>
+                        <div style="font-size: 0.8em; color: #7f8c8d; line-height: 1.3;">
+                            • 핵심 특허 즉시 출원<br>
+                            • 개선 발명 지속 발굴<br>
+                            • 추가 특허 출원 계획
+                        </div>
+                    </div>
+                    
+                    <div style="padding: 10px; background: #f8f9fa; border-radius: 8px;">
+                        <div style="font-weight: bold; color: #2c3e50; margin-bottom: 6px;">🚀 출시 단계 (6개월 이후)</div>
+                        <div style="font-size: 0.8em; color: #7f8c8d; line-height: 1.3;">
+                            • 특허 포트폴리오 완성<br>
+                            • 권리 행사 및 라이선싱<br>
+                            • 지속적 모니터링
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 7: 체크리스트 -->
+            <div class="slide">
+                <div class="slide-title">📋 개발자 특허 체크리스트</div>
+                <div class="slide-subtitle">단계별 실행 가이드</div>
+
+                <div class="mobile-checklist">
+                    <div class="checklist-section">
+                        <div class="checklist-header">
+                            <div class="checklist-badge" style="background: #e74c3c;">👨‍💻 개발자</div>
+                            <div class="checklist-title">매일 체크</div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">기술 문제 해결 시 특허 가능성 검토</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">아이디어 노트에 해결 과정 기록</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">새로운 접근법 발견 시 문서화</div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <div class="checklist-header">
+                            <div class="checklist-badge" style="background: #f39c12;">⚖️ 특허팀</div>
+                            <div class="checklist-title">매주 체크</div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">경쟁사 신규 특허 출원 모니터링</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">개발 중인 기술의 특허성 평가</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">기술 트렌드 변화 추적</div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <div class="checklist-header">
+                            <div class="checklist-badge" style="background: #3498db;">⚖️ 특허팀</div>
+                            <div class="checklist-title">매월 체크</div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">발명신고서 작성 대상 선별</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">기존 특허 회피 설계 검토</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">특허 포트폴리오 업데이트</div>
+                        </div>
+                    </div>
+
+                    <div class="checklist-section">
+                        <div class="checklist-header">
+                            <div class="checklist-badge" style="background: #27ae60;">⚖️ 특허팀</div>
+                            <div class="checklist-title">프로젝트별</div>
+                        </div>
+                        
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">개발 시작 전 FTO 분석</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">설계 완료 후 포트폴리오 계획</div>
+                        </div>
+                        <div class="checklist-item">
+                            <div class="checkbox" onclick="toggleCheck(this)"></div>
+                            <div class="checklist-text">출시 전 최종 특허 클리어런스</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-card">
+                    <h3>🤝 지속적인 소통이 핵심</h3>
+                    <p>개발자의 일상적 발견 → 특허 담당자의 전문적 분석 → 강력한 IP 포트폴리오 구축</p>
+                </div>
+            </div>
+
+            <!-- 슬라이드 8: Q&A -->
+            <div class="slide">
+                <div class="slide-title">❓ 질의응답</div>
+                <div class="slide-subtitle">자주 묻는 질문</div>
+                
+                <div class="qa-mobile-container">
+                    <div class="qa-mobile-card">
+                        <div class="qa-mobile-question">❓ 특허 출원 시기는 언제가 가장 적절한가요?</div>
+                        <div class="qa-mobile-answer">
+                            개발 초기에 핵심 아이디어를 특허 출원하고, 개발 과정에서 개선된 기술은 개량 특허로 추가 출원하는 전략이 효과적입니다. 시장 출시 최소 1년 전에는 핵심 특허를 출원 완료하는 것이 좋습니다.
+                        </div>
+                    </div>
+
+                    <div class="qa-mobile-card">
+                        <div class="qa-mobile-question">❓ 개발자가 평소에 할 수 있는 특허 활동은?</div>
+                        <div class="qa-mobile-answer">
+                            아이디어 노트를 꾸준히 작성하고, 주 1회 팀 내 발명 토론 시간을 갖는 것이 좋습니다. 또한 정기적인 경쟁사 특허 모니터링을 통해 기술 트렌드를 파악하고 우회 설계 가능성도 검토하세요.
+                        </div>
+                    </div>
+
+                    <div class="qa-mobile-card">
+                        <div class="qa-mobile-question">❓ 예산이 제한적일 때 특허 전략은?</div>
+                        <div class="qa-mobile-answer">
+                            브루마블에서 선택과 집중하듯, 핵심 기능에 대해서만 전략적으로 특허 출원하세요. 높은 가치 + 높은 침해 위험 기술을 최우선으로, 나머지는 영업비밀이나 방어 출원으로 관리하는 것이 효율적입니다.
+                        </div>
+                    </div>
+
+                    <div class="qa-mobile-card">
+                        <div class="qa-mobile-question">❓ 경쟁사 특허를 우회하는 방법은?</div>
+                        <div class="qa-mobile-answer">
+                            선행기술 조사를 통해 경쟁사 특허의 권리범위를 정확히 파악하고, 그 범위를 벗어나는 대안 기술을 개발하거나, 경쟁사 특허의 무효 가능성을 검토해 볼 수 있습니다. 전문가와의 상담이 필수입니다.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 9: 마무리 -->
+            <div class="slide">
+                <div class="slide-title">🎯 승리하는 특허 전략</div>
+                <div class="slide-subtitle">마무리</div>
+                
+                <div class="comparison-container">
+                    <div class="comparison-card game">
+                        <h3 style="color: #ff6b6b; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            🎲 브루마블 승리 공식
+                        </h3>
+                        <div style="font-size: 0.9em; line-height: 1.5; color: #2c3e50;">
+                            • 핵심 지역 선점<br>
+                            • 단계적 건물 업그레이드<br>
+                            • 색깔별 완전 독점<br>
+                            • 지속적 수익 창출
+                        </div>
+                    </div>
+                    
+                    <div class="comparison-card patent">
+                        <h3 style="color: #4ecdc4; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                            📋 특허 포트폴리오 성공 공식
+                        </h3>
+                        <div style="font-size: 0.9em; line-height: 1.5; color: #2c3e50;">
+                            • 핵심 기술 선점<br>
+                            • 기본→개량→원천특허<br>
+                            • 기능별 완전 보호<br>
+                            • 라이선싱 수익 창출
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-card">
+                    <h3>💡 핵심 메시지</h3>
+                    <p style="font-size: 1.1em; font-weight: 600; margin-bottom: 12px;">
+                        지속적인 소통이 성공적인 특허 전략의 핵심입니다
+                    </p>
+                    <p style="font-size: 0.95em; line-height: 1.5; opacity: 0.95;">
+                        개발자의 창의적 발명 → IP팀의 전략적 출원 → 강력한 특허 포트폴리오 → 시장에서의 경쟁 우위
+                    </p>
+                </div>
+
+                <div class="content-card" style="text-align: center;">
+                    <h3 style="color: #2c3e50; margin-bottom: 12px; font-size: 1.2em;">🤝 Thank You!</h3>
+                    <p style="color: #666; font-size: 1em;">브루마블로 배우는 특허 전략 강의를 마칩니다</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 네비게이션 -->
+        <div class="bottom-nav">
+            <button class="nav-btn" id="prevBtn" onclick="previousSlide()">◀</button>
+            <div class="slide-dots" id="slideDots">
+                <div class="dot active"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+            <button class="nav-btn" id="nextBtn" onclick="nextSlide()">▶</button>
+        </div>
+
+        <!-- 스와이프 힌트 -->
+        <div class="swipe-hint" id="swipeHint">
+            👆 위로 스크롤 또는 좌우 스와이프로 탐색
+        </div>
+    </div>
+
+    <script>
+        let currentSlideIndex = 0;
+        const totalSlides = 9;
+        let slides = document.querySelectorAll('.slide');
+        let dots = document.querySelectorAll('.dot');
+        let startX = 0;
+        let endX = 0;
+        let startY = 0;
+        let endY = 0;
+
+        // 체크박스 토글 함수
+        function toggleCheck(checkbox) {
+            if (checkbox.classList.contains('checked')) {
+                checkbox.classList.remove('checked');
+                checkbox.innerHTML = '';
+            } else {
+                checkbox.classList.add('checked');
+                checkbox.innerHTML = '✓';
+            }
+        }
+
+        // 슬라이드 이동 함수
+        function goToSlide(index) {
+            if (index === currentSlideIndex) return;
+            
+            // 현재 슬라이드 숨기기
+            slides[currentSlideIndex].classList.remove('active');
+            if (index > currentSlideIndex) {
+                slides[currentSlideIndex].classList.add('prev');
+            } else {
+                slides[currentSlideIndex].classList.remove('prev');
+            }
+            
+            // 새 슬라이드 보이기
+            setTimeout(() => {
+                slides[currentSlideIndex].classList.remove('prev');
+                slides[index].classList.add('active');
+                if (index > currentSlideIndex) {
+                    slides[index].classList.remove('prev');
+                }
+            }, 50);
+
+            // 도트 업데이트
+            dots[currentSlideIndex].classList.remove('active');
+            dots[index].classList.add('active');
+
+            // 프로그레스 바 업데이트
+            const progressFill = document.getElementById('progressFill');
+            progressFill.style.width = ((index + 1) / totalSlides * 100) + '%';
+
+            // 슬라이드 카운터 업데이트
+            document.getElementById('slideCounter').textContent = `${index + 1}/${totalSlides}`;
+
+            currentSlideIndex = index;
+            updateNavigationButtons();
+            
+            // 스와이프 힌트 숨기기
+            if (index > 0) {
+                document.getElementById('swipeHint').style.display = 'none';
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlideIndex < totalSlides - 1) {
+                goToSlide(currentSlideIndex + 1);
+            }
+        }
+
+        function previousSlide() {
+            if (currentSlideIndex > 0) {
+                goToSlide(currentSlideIndex - 1);
+            }
+        }
+
+        function updateNavigationButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            prevBtn.disabled = currentSlideIndex === 0;
+            nextBtn.disabled = currentSlideIndex === totalSlides - 1;
+        }
+
+        // 터치 이벤트 처리
+        document.addEventListener('touchstart', function(e) {
+            startX = e.touches[0].clientX;
+            startY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', function(e) {
+            endX = e.changedTouches[0].clientX;
+            endY = e.changedTouches[0].clientY;
+            handleSwipe();
+        }, { passive: true });
+
+        function handleSwipe() {
+            const diffX = startX - endX;
+            const diffY = startY - endY;
+            const threshold = 50;
+
+            // 수평 스와이프가 수직 스와이프보다 클 때만 슬라이드 변경
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    nextSlide(); // 왼쪽으로 스와이프 = 다음 슬라이드
+                } else {
+                    previousSlide(); // 오른쪽으로 스와이프 = 이전 슬라이드
+                }
+            }
+        }
+
+        // 키보드 네비게이션
+        document.addEventListener('keydown', function(e) {
+            switch(e.key) {
+                case 'ArrowRight':
+                case ' ':
+                    e.preventDefault();
+                    nextSlide();
+                    break;
+                case 'ArrowLeft':
+                    e.preventDefault();
+                    previousSlide();
+                    break;
+                case 'Home':
+                    e.preventDefault();
+                    goToSlide(0);
+                    break;
+                case 'End':
+                    e.preventDefault();
+                    goToSlide(totalSlides - 1);
+                    break;
+            }
+        });
+
+        // 도트 클릭 이벤트
+        dots.forEach((dot, index) => {
+            dot.addEventListener('click', () => goToSlide(index));
+        });
+
+        // 초기화
+        updateNavigationButtons();
+        
+        // 스와이프 힌트 자동 숨기기
+        setTimeout(() => {
+            if (currentSlideIndex === 0) {
+                document.getElementById('swipeHint').style.animation = 'fadeInOut 1.5s infinite';
+            }
+        }, 3000);
+
+        // 뷰포트 높이 조정 (모바일 브라우저 주소창 대응)
+        function setViewportHeight() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+
+        window.addEventListener('resize', setViewportHeight);
+        setViewportHeight();
+    </script>
+</body>
+</html>
